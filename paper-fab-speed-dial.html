@@ -16,19 +16,24 @@ A floating action button flinging out related actions
 	<template>
 		<style include="iron-flex iron-flex-alignment iron-flex-reverse">
 			:host {
-				@apply(--layout-vertical-reverse);
 				position: absolute;
 				bottom: 10px;
 				right: 10px;
+				@apply(--layout-vertical-reverse);
+				@apply(--layout-center);
 				@apply(--paper-fab-speed-dial);
+				@apply(--paper-fab-speed-dial-orientation);
 			}
 			
 			:host::content > .dropdown-content {
 				@apply(--layout-vertical-reverse);
+				@apply(--layout-center);
+				@apply(--paper-fab-speed-dial-orientation);
 			}
 			
 			:host::content > .dropdown-content paper-fab {
 				margin: 0px 8px 10px 8px;
+				@apply(--paper-fab-speed-dial--inner-fab);
 			}
 			
 			:host::content > .dropdown-content[hidden] {
@@ -48,14 +53,22 @@ A floating action button flinging out related actions
 				Polymer.NeonAnimationRunnerBehavior
 			],
 
-			ready: function () {
+			ready: function() {
 				var button = this._getTriggerElement();
 				var menu = this._getDropdownContent();
-				this.listen(button, 'tap', 'toggle');
 				menu.hidden = !this.active;
+				this.listen(button, 'tap', 'toggle');
+				if (this.closeOnMouseleave) {
+					this.listen(this, 'mouseleave', 'close');
+				}
 			},
 
 			properties: {
+				closeOnMouseleave: {
+					type: Boolean,
+					value: false
+				},
+
 				active: {
 					type: Boolean,
 					value: false,
@@ -85,7 +98,7 @@ A floating action button flinging out related actions
 				}
 			},
 
-			toggle: function () {
+			toggle: function() {
 				var menu = this._getDropdownContent();
 				menu.hidden = false;
 				this.active = !this.active;
@@ -93,23 +106,34 @@ A floating action button flinging out related actions
 				this.playAnimation(animation);
 			},
 
+			open: function() {
+				if (!this.active) {
+					this.toggle();
+				}
+			},
+
+			close: function() {
+				if (this.active) {
+					this.toggle();
+				}
+			},
+
 			listeners: {
 				'neon-animation-finish': '_onNeonAnimationFinish'
 			},
 
-			_onNeonAnimationFinish: function () {
+			_onNeonAnimationFinish: function() {
 				var menu = this._getDropdownContent();
 				menu.hidden = !this.active;
 			},
 
-			_getTriggerElement: function () {
+			_getTriggerElement: function() {
 				return this.queryEffectiveChildren(':first-child');
 			},
 
-			_getDropdownContent: function () {
+			_getDropdownContent: function() {
 				return this.queryEffectiveChildren('.dropdown-content');
 			}
-
 		});
 	</script>
 </dom-module>
