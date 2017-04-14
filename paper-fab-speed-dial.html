@@ -76,6 +76,13 @@ A floating action button flinging out related actions
 					reflectToAttribute: true
 				},
 
+				// similar to `active`, except that it is only `true` once the entry animation is over
+				opened: {
+					type: Boolean,
+					value: false,
+					notify: true
+				},
+
 				animationConfig: {
 					value: function () {
 						const menu = this._getDropdownContent();
@@ -110,6 +117,7 @@ A floating action button flinging out related actions
 				const menu = this._getDropdownContent();
 				menu.hidden = false;
 				this.active = !this.active;
+				this.set('opened', false);
 				const animation = this.active ? 'entry' : 'exit';
 				this.playAnimation(animation, animation);
 			},
@@ -131,7 +139,8 @@ A floating action button flinging out related actions
 			},
 
 			_onNeonAnimationFinish: function() {
-				var menu = this._getDropdownContent();
+				this.set('opened', this.active && !(this._active['entry'] || this._active['exit']))
+				const menu = this._getDropdownContent(); 
 				menu.hidden = !(this.active || this._active['entry'] || this._active['exit']);
 			},
 
